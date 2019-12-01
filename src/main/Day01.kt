@@ -9,17 +9,13 @@ class Day01(input: List<String>) {
     fun part1() = input.sumBy { it / 3 - 2 }
 
     fun part2(): Int = input.sumBy {
-        val initialFuel = it / 3 - 2
-        var totalFuel = initialFuel
-
-        var accumulator = initialFuel
-        while (true) {
-            val extraFuel = accumulator / 3 - 2
-            if (extraFuel <= 0) break
-            totalFuel += extraFuel
-            accumulator = extraFuel
+        var total = 0
+        var current = it / 3 - 2
+        while (current > 0) {
+            total += current
+            current = current / 3 - 2
         }
-        totalFuel
+        return@sumBy total
     }
 
 }
