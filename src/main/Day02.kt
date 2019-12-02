@@ -13,17 +13,12 @@ class Day02(input: String) {
             var index = 0
             parsing@ while (index < size) {
                 when (val opcode = this[index]) {
-                    1 -> {
-                        this[this[index + 3]] = this[this[index + 1]] + this[this[index + 2]]
-                        index += 4
-                    }
-                    2 -> {
-                        this[this[index + 3]] = this[this[index + 1]] * this[this[index + 2]]
-                        index += 4
-                    }
+                    1 -> this[this[index + 3]] = this[this[index + 1]] + this[this[index + 2]]
+                    2 -> this[this[index + 3]] = this[this[index + 1]] * this[this[index + 2]]
                     99 -> break@parsing
                     else -> throw UnsupportedOperationException(opcode.toString())
                 }
+                index += 4
             }
         }[0]
     }
