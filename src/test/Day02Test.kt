@@ -44,7 +44,7 @@ internal class Day02Test {
             // When
             val day = Day02(sampleInput)
             // Then
-            assertThat(day.part2(30)).isEqualTo(101)
+            assertThat(day.part2(30)).isEqualTo(0)
         }
 
         @Test
