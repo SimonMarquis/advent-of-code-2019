@@ -1,3 +1,6 @@
+import Day05.IntcodeComputer.Mode.Immediate
+import Day05.IntcodeComputer.Mode.Position
+
 /*
  * Copyright (c) 2019 Simon Marquis
  */
@@ -7,117 +10,61 @@ class Day05(input: String) {
 
     private val input = input.split(",").map { it.toInt() }
 
-    fun part1(userInput: Int): Int {
-        var output = 0
-        val program = input.toMutableList()
-        var index = 0
-        parsing@ while (index < program.size) {
-            val raw = program[index++]
-            val first = Mode.parse((raw / 100) % 10)
-            val second = Mode.parse((raw / 1000) % 10)
-            val third = Mode.parse((raw / 10000) % 10)
-            when (val opcode = raw % 100) {
-                1 -> {
-                    val left = first.get(program, index++)
-                    val right = second.get(program, index++)
-                    third.set(program, index++, left + right)
+    fun part1(userInput: Int): Int = IntcodeComputer(input).diagnostic(userInput)
+
+    fun part2(userInput: Int): Int = IntcodeComputer(input).diagnostic(userInput)
+
+    private class IntcodeComputer(val rom: List<Int>) {
+
+        private sealed class Mode {
+            object Position : Mode()
+            object Immediate : Mode()
+        }
+
+        fun diagnostic(userInput: Int? = null): Int {
+            val ram = rom.toMutableList()
+            var output = 0
+            var index = 0
+
+            parsing@ while (index < ram.size) {
+                val instruction = ram[index]
+
+                fun mode(offset: Int): Mode = when (when (offset) {
+                    1 -> (instruction / 100)
+                    2 -> (instruction / 1000)
+                    3 -> (instruction / 10000)
+                    else -> throw UnsupportedOperationException()
+                } % 10) {
+                    0 -> Position
+                    1 -> Immediate
+                    else -> throw UnsupportedOperationException()
                 }
-                2 -> {
-                    val left = first.get(program, index++)
-                    val right = second.get(program, index++)
-                    third.set(program, index++, left * right)
+
+                fun read(offset: Int) = when (mode(offset)) {
+                    Position -> ram[ram[index + offset]]
+                    Immediate -> ram[index + offset]
                 }
-                3 -> {
-                    first.set(program, index++, userInput)
+
+                fun write(offset: Int, value: Int) = when (mode(offset)) {
+                    Position -> ram[ram[index + offset]] = value
+                    Immediate -> throw UnsupportedOperationException()
                 }
-                4 -> {
-                    output = first.get(program, index++)
+
+                when (val opcode = instruction % 100) {
+                    1 -> write(3, read(1) + read(2)).also { index += 4 }
+                    2 -> write(3, read(1) * read(2)).also { index += 4 }
+                    3 -> write(1, userInput ?: throw UnsupportedOperationException()).also { index += 2 }
+                    4 -> output = read(1).also { index += 2 }
+                    5 -> if (read(1) != 0) index = read(2) else index += 3
+                    6 -> if (read(1) == 0) index = read(2) else index += 3
+                    7 -> write(3, if (read(1) < read(2)) 1 else 0).also { index += 4 }
+                    8 -> write(3, if (read(1) == read(2)) 1 else 0).also { index += 4 }
+                    99 -> break@parsing
+                    else -> throw UnsupportedOperationException(opcode.toString())
                 }
-                99 -> break@parsing
-                else -> throw UnsupportedOperationException(opcode.toString())
             }
+            return output
         }
-        return output
-    }
-
-    fun part2(userInput: Int): Int {
-        var output = 0
-        val program = input.toMutableList()
-        var index = 0
-        parsing@ while (index < program.size) {
-            val raw = program[index++]
-            val first = Mode.parse((raw / 100) % 10)
-            val second = Mode.parse((raw / 1000) % 10)
-            val third = Mode.parse((raw / 10000) % 10)
-            when (val opcode = raw % 100) {
-                1 -> {
-                    val left = first.get(program, index++)
-                    val right = second.get(program, index++)
-                    third.set(program, index++, left + right)
-                }
-                2 -> {
-                    val left = first.get(program, index++)
-                    val right = second.get(program, index++)
-                    third.set(program, index++, left * right)
-                }
-                3 -> {
-                    first.set(program, index++, userInput)
-                }
-                4 -> {
-                    output = first.get(program, index++)
-                }
-                5 -> {
-                    val left = first.get(program, index++)
-                    val right = second.get(program, index++)
-                    if (left != 0) index = right
-                }
-                6 -> {
-                    val left = first.get(program, index++)
-                    val right = second.get(program, index++)
-                    if (left == 0) index = right
-                }
-                7 -> {
-                    val left = first.get(program, index++)
-                    val right = second.get(program, index++)
-                    third.set(program, index++, if (left < right) 1 else 0)
-                }
-                8 -> {
-                    val left = first.get(program, index++)
-                    val right = second.get(program, index++)
-                    third.set(program, index++, if (left == right) 1 else 0)
-                }
-                99 -> break@parsing
-                else -> throw UnsupportedOperationException(opcode.toString())
-            }
-        }
-        return output
-    }
-
-    private sealed class Mode {
-
-        companion object {
-            fun parse(int: Int): Mode = when (int) {
-                0 -> Position
-                1 -> Immediate
-                else -> throw UnsupportedOperationException()
-            }
-        }
-
-        abstract fun get(program: List<Int>, index: Int): Int
-        abstract fun set(program: MutableList<Int>, index: Int, value: Int)
-
-        object Position : Mode() {
-            override fun get(program: List<Int>, index: Int): Int = program[program[index]]
-            override fun set(program: MutableList<Int>, index: Int, value: Int) {
-                program[program[index]] = value
-            }
-        }
-
-        object Immediate : Mode() {
-            override fun get(program: List<Int>, index: Int): Int = program[index]
-            override fun set(program: MutableList<Int>, index: Int, value: Int) = throw UnsupportedOperationException()
-        }
-
     }
 
 }
