@@ -20,10 +20,9 @@ internal class Day09Test {
         @Test
         fun `Matches example 1`() {
             // When
-            val input = "109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99"
-            val day = Day09(input)
+            val day = Day09("109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99")
             // Then
-            assertThat(day.part1(11111)).isEqualTo(input.split(",").map { it.toLong() })
+            assertThat(day.part1(11111)).isEqualTo(99)
         }
 
         @Test
@@ -31,7 +30,7 @@ internal class Day09Test {
             // When
             val day = Day09("1102,34915192,34915192,7,4,7,99,0")
             // Then
-            assertThat(day.part1(1).last()).isEqualTo(1219070632396864)
+            assertThat(day.part1(1)).isEqualTo(1219070632396864)
         }
 
         @Test
@@ -39,7 +38,7 @@ internal class Day09Test {
             // When
             val day = Day09("104,1125899906842624,99")
             // Then
-            assertThat(day.part1(1).last()).isEqualTo(1125899906842624)
+            assertThat(day.part1(1)).isEqualTo(1125899906842624)
         }
 
         @Test
@@ -47,7 +46,7 @@ internal class Day09Test {
             // When
             val day = Day09(actualInput)
             // Then
-            assertThat(day.part1(1).last()).isEqualTo(3241900951)
+            assertThat(day.part1(1)).isEqualTo(3241900951)
         }
     }
 
@@ -60,7 +59,7 @@ internal class Day09Test {
             // When
             val day = Day09(actualInput)
             // Then
-            assertThat(day.part2(2).last()).isEqualTo(83089)
+            assertThat(day.part2(2)).isEqualTo(83089)
         }
     }
 

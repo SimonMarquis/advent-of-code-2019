@@ -12,3 +12,5 @@ fun <T> List<T>.permutations(): Set<List<T>> =
             }
         }
     }.toSet()
+
+class Wrapper<T>(var value: T)
